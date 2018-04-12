@@ -3,8 +3,12 @@ from sklearn.model_selection import LeaveOneOut
 import LEM1
 import RuleCheckerUtility
 import LEM1Utility
+import RuleChecker
 
-def CrossValidation(attr, decisions, DesName, meathod, iterations = 10):
+def CrossValidation(attr, decisions, DesName, meathod, iterations):
+    if not iterations:
+        iterations = 200
+
     print "\n\tCONFIGURING RULE CHECKER"
     matchingFactor = raw_input("\t\tDo you wish to use Matching Factor ? (y / RETURN) ")
     while (True):
@@ -33,14 +37,13 @@ def CrossValidation(attr, decisions, DesName, meathod, iterations = 10):
             break
         else:
             supportFactor = raw_input("\t\tDo you wish to use Support of other rules ? (y / RETURN) ")
+
+    ErrorRates = []
     if meathod == 'Bootstrap':
         for _ in range(int(iterations)):
             numOfCases = len(attr)
-            trainDataInd = 0
-            testDataInd = 0
             trainDataInd = resample(range(numOfCases))
             testDataInd = [x for x in range(numOfCases) if x not in trainDataInd]
-            stats = []
             trainDataAttr = [attr[i] for i in trainDataInd]
             trainDataDes = [decisions[i] for i in trainDataInd]
             testDataAttr = []
@@ -54,4 +57,30 @@ def CrossValidation(attr, decisions, DesName, meathod, iterations = 10):
                 testDataAttr[i][DesName] = testDataDes[i][DesName]
             Rules = LEM1.LEM1Classifier(trainDataAttr, trainDataDes, DesName)
             RuleStats = RuleCheckerUtility.getRuleTrainStats(Rules, trainDataAttr, trainDataDes, DesName)
-            print RuleStats
+            for i in range(len(Rules)):
+                Rules[i].update(RuleStats[i])
+            ErrorRates.append(RuleChecker.RuleChecker(Rules, testDataAttr, DesName, strengthFactor, matchingFactor, specificityFactor, supportFactor))
+        print ErrorRates
+    else:
+        for i in range(len(attr)):
+            numOfCases = len(attr)
+            CaseNumbers = list(range(numOfCases))
+            testDataInd = [i]
+            trainDataInd = [j for j in CaseNumbers if j not in testDataInd]
+            trainDataAttr = [attr[i] for i in trainDataInd]
+            trainDataDes = [decisions[i] for i in trainDataInd]
+            testDataAttr = []
+            testDataDes = []
+            for i in testDataInd:
+                testDataAttr.append(dict(attr[i]))
+            tempDecisions = LEM1Utility.tupleToDict(decisions)
+            for i in testDataInd:
+                testDataDes.append(dict(tempDecisions[i]))
+            for i in range(len(testDataDes)):
+                testDataAttr[i][DesName] = testDataDes[i][DesName]
+            Rules = LEM1.LEM1Classifier(trainDataAttr, trainDataDes, DesName)
+            RuleStats = RuleCheckerUtility.getRuleTrainStats(Rules, trainDataAttr, trainDataDes, DesName)
+            for i in range(len(Rules)):
+                Rules[i].update(RuleStats[i])
+            ErrorRates.append(RuleChecker.RuleChecker(Rules, testDataAttr, DesName, strengthFactor, matchingFactor, specificityFactor, supportFactor))
+        print ErrorRates

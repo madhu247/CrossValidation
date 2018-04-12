@@ -1,15 +1,14 @@
 import re
-import CrossValidation as cv
-import math
+import CrossValidation
 
 def main():
     print ""
     print "\t+----------------------------------------------------------------+"
     print "\t|                                                                |"
-    print "\t|       RULE CHECKER - PROGRAMMING PROJECT EECS 839              |"
+    print "\t|       CROSS VALIDATION OF LEARNING FORM EXAMPLE MODULES (LEM1) |"
+    print "\t|                    RULE INDUCTION ALGORITHM                    |"
     print "\t|       Author : Madhu Chegondi                                  |"
     print "\t|       KUID   : m136c192                                        |"
-    print "\t|       Created: 03/23/2017                                      |"
     print "\t|                                                                |"
     print "\t+----------------------------------------------------------------+"
     print ""
@@ -51,19 +50,20 @@ def main():
             dataFile = raw_input("\tEnter Name Of DataFile : ")
 
     print "\n\tCROSS VALIDATION TECHNIQUES"
-    print "\t\t1. Bootstrap"
-    print "\t\t2. Leaving One Out"
-    choice  = raw_input("\n\tEnter your choice (1 or 2) : ")
+    print "\t\t1. BOOTSTRAP CROSS VALIDATION"
+    print "\t\t2. LEAVING ONE OUT CROSS VALIDATION"
+    choice  = raw_input("\n\tENTER YOUR CHOICE OF CROSS VALIDATION (1 or 2) : ")
 
 
     if choice == '1':
         method = 'Bootstrap'
         print "\n\tCONFIGURING BOOTSTRAP"
-        iterations = raw_input("\t\tHow many samples do you wish to create ? ")
+        iterations = raw_input("\t\tNumber of Samples (default 50 samples)")
     else:
         method = 'LeaveOneOut'
+        iterations = 0
 
-    cv.CrossValidation(attr, decisions, DesName, method)
+    CrossValidation.CrossValidation(attr, decisions, DesName, method, iterations)
 
 if __name__ == '__main__':
     main()

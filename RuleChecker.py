@@ -5,10 +5,8 @@ main.py, by Madhu Chegondi, 03-23-2018
 """
 
 import RuleCheckerUtility
-import re
 
-def RuleChecker():
-
+def RuleChecker(Rules, Cases, DesName, strengthFactor, matchingFactor = None, specificityFactor = None, supportFactor = None):
     correctlyClassifiedCases = []
     inCorrectlyClassifiedCases = []
     notClassifiedCases = []
@@ -85,9 +83,6 @@ def RuleChecker():
     parCorClass = len(correctSet)
 
     notClassifiedPlusInCorrCases = parInCorClass + notClassifiedCases
-
-    print "\tError Rate : ", round(float(notClassifiedPlusInCorrCases)/float(len(Cases)) , 2)
-    print ""
-
-if __name__ == '__main__':
-    main()
+    if len(Cases) == 0:
+        return 0
+    return round(float(notClassifiedPlusInCorrCases)/float(len(Cases)) , 2)

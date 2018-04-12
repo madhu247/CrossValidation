@@ -8,7 +8,6 @@ import LEM1Utility
 import time
 
 def LEM1Classifier(trainDataAttr, trainDataDes, DesName):
-    print "\n\tRunning LEM1 to generate Rules...."
     updatedAttr = LEM1Utility.cutpointStrategy1(trainDataAttr)
 
     # Converiting list of dictionaries to "list of List of tuples"

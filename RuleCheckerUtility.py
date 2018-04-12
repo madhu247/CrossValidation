@@ -13,9 +13,7 @@ def getRuleTrainStats(Rules, trainAttr, trainDes, DesName):
     tempDecisions = LEM1Utility.tupleToDict(trainDes)
     for i in range(len(trainDes)):
         Cases[i][DesName] = tempDecisions[i][DesName]
-
-    RuleStats = [[] for i in range(len(Rules))]
-
+    RuleStats = []
     for i in range(len(Rules)):
         strength = 0
         flag = 1
@@ -41,7 +39,7 @@ def getRuleTrainStats(Rules, trainAttr, trainDes, DesName):
         d['numOfTrainCasesMatched'] = numOfTrainCasesMatched
         d['strength'] = strength
         d['specificity'] = len(Rules[i])-1
-        RuleStats[i].append(d)
+        RuleStats.append(d)
     return RuleStats
 
 
@@ -65,55 +63,6 @@ def checkRulesForPartialMatching(Rules, Cases, DesName):
         return matchedCases
     else:
         return matchedCases
-
-
-def checkRuleFile(fileName):
-    fp = open(fileName, 'r')
-    pattern = re.compile(r"[0-9]+\s*,\s*[0-9]+\s*,\s*[0-9]+\s* (\( [a-zA-Z0-9\-_\s,]+ ([0-9]+.?[0-9]* | [0-9]+.?[0-9]*..[0-9]+.?[0-9]* | [a-zA-Z0-9\-_]+)\)\s*[\^\&]{0,1}\s*)+\-{1,2}>\s*\( [a-zA-Z0-9\-_\s,]+ ([0-9]+.?[0-9]* | [0-9]+.?[0-9]*..[0-9]+.?[0-9]* | [a-zA-Z0-9\-_]+)\)",re.VERBOSE)
-    flag = 0
-    tmpLine =''
-    arrayOfDicts = []
-    for line in fp:
-        if re.match(r'^\!.*', line) or line.strip() == '':
-            continue
-        tmpLine = tmpLine + ''.join(line)
-        if pattern.match(tmpLine):
-            # Check for \r too Carriage Return
-            tmpLine = ' '.join(tmpLine.split('\n'))
-            arrayOfDicts.append(dictFromRules(tmpLine))
-            tmpLine = ''
-            flag = 1
-        else:
-            flag = 0
-            continue
-    if flag == 0:
-        arrayOfDict = None
-        return False, arrayOfDicts
-    else:
-        return True, arrayOfDicts
-
-
-def dictFromRules(RuleString):
-    d = {}
-    numOfConditions = 0
-    start = RuleString.find('(')
-    [d['specificity'], d['strength'], d['numOfTrainCasesMatched']] = RuleString[0:start].split(',')
-    d['specificity'] = int(d['specificity'].strip())
-    d['strength'] = int(d['strength'].strip())
-    d['numOfTrainCasesMatched'] = int(d['numOfTrainCasesMatched'].strip())
-    desIndex = RuleString.rfind('(')
-    d[RuleString[desIndex+1:].split(',')[0].strip()] = RuleString[desIndex:].split(',')[1].strip().replace(')','')
-    end = RuleString.find('->')
-    if RuleString[end-1] == '-':
-        end = end - 1
-    for char in ['(', ')', '&', ',', '^']:
-        if char in RuleString[start:end]:
-            RuleString = RuleString.replace(char, ' ')
-    for i in range(0,len(RuleString[start:end].split())-1,2):
-        numOfConditions = numOfConditions + 1
-        d[RuleString[start:end].split()[i]] = RuleString[start:end].split()[i+1]
-    d['numOfConditions'] = numOfConditions
-    return d
 
 
 def checkRules(Rules, Cases, DesName):
