@@ -53,17 +53,22 @@ def main():
     print "\t\t1. BOOTSTRAP CROSS VALIDATION"
     print "\t\t2. LEAVING ONE OUT CROSS VALIDATION"
     choice  = raw_input("\n\tENTER YOUR CHOICE OF CROSS VALIDATION (1 or 2) : ")
+    while True:
+        if choice == '1' or choice == '2':
+            break
+        else:
+            choice  = raw_input("\tENTER YOUR CHOICE OF CROSS VALIDATION (1 or 2) : ")
 
 
+    samples = None
     if choice == '1':
         method = 'Bootstrap'
         print "\n\tCONFIGURING BOOTSTRAP"
-        iterations = raw_input("\t\tNumber of Samples (default 50 samples)")
+        samples = raw_input("\t\tHow many samples do you wish to create (default 200 samples) : ")
     else:
         method = 'LeaveOneOut'
-        iterations = 0
 
-    CrossValidation.CrossValidation(attr, decisions, DesName, method, iterations)
+    CrossValidation.CrossValidation(attr, decisions, DesName, method, samples, dataFile)
 
 if __name__ == '__main__':
     main()
