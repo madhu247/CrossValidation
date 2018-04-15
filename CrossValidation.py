@@ -49,7 +49,7 @@ def CrossValidation(attr, decisions, DesName, meathod, samples, df):
     if meathod == 'Bootstrap':
         if not samples:
             samples = 200
-        for numIter in range(50):
+        for numIter in range(30):
             print "\tIterations Completed {0}".format(numIter+1),
             ErrorRates = []
             for m in range(int(samples)):
@@ -82,7 +82,7 @@ def CrossValidation(attr, decisions, DesName, meathod, samples, df):
             writeToLog(logData, df)
             logData = {}
     else:
-        for numIter in range(50):
+        for numIter in range(30):
             print "\tIterations Completed {0}".format(numIter+1),
             ErrorRates = []
             for i in range(len(attr)):

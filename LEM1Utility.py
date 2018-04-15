@@ -3,7 +3,6 @@
 """
 utility.py, by Madhu Chegondi, 03-23-2018
 """
-import pandas as pd
 
 def computePartitions(S):
     """
@@ -44,7 +43,6 @@ def isConsistent(attrPartitions, decPartitions):
             return False
     return True
 
-
 def LEM1(S, R):
     """
     input       : list of list of tuples of attributes and decisions
@@ -55,50 +53,19 @@ def LEM1(S, R):
     S_partitions = computePartitions(S)
     P = S[:]
     if(isConsistent(S_partitions[0], R_partitions[0])):
-        tempS = tupleToDict(S)
-
-        df = pd.DataFrame(tempS)
-        # collect all the column names to keep track of removed attribute name
-        XColNames = list(df.columns.values)
-        for i in range(len(df.columns)):
-            # Reomve first column Name and pass to the dataFrame
-            bkpCol = XColNames.pop(0)
-            Q = df.ix[:, XColNames].T.to_dict().values()
-            Q1 = dictToTuple(Q)
-            Q_partitions = computePartitions(Q1)
-            if (isConsistent(Q_partitions[0], R_partitions[0])):
-                P = Q1[:]
-            else:
-                # after removing column if the dataset if not consistent append the
-                # column to the end of Column Names. Cause everytime we are removing
-                # the first element from the Column Names
-                XColNames.append(bkpCol)
-        return P
-    return """ Something went wrong with LOWER and UPPER approximations !!! """
-
-def LEM(S, R):
-    """
-    input       : list of list of tuples of attributes and decisions
-    output      : list of list of tuples after applying LEM1 with
-                  few attribute values
-    """
-    R_partitions = computePartitions(R)
-    S_partitions = computePartitions(S)
-    P = S[:]
-    if(isConsistent(S_partitions[0], R_partitions[0])):
         df = tupleToDict(S)
-
         # df = pd.DataFrame(tempS)
         # collect all the column names to keep track of removed attribute name
         XColNames = df[0].keys()
-        for i in renage(len(df)):
+        for _ in range(len(XColNames)):
             # Reomve first column Name and pass to the dataFrame
-            bkpCol = XColNames.pop(i)
+            bkpCol = XColNames.pop(0)
+            tempQ = {}
+            Q = []
             for item in df:
                 for key in XColNames:
-                    tempQ[key] = item[i]
-                    Q.append(tempQ.items())
-            # Q = df.ix[:, XColNames].T.to_dict().values()
+                    tempQ[key] = item[key]
+                Q.append(dict(tempQ))
             Q1 = dictToTuple(Q)
             Q_partitions = computePartitions(Q1)
             if (isConsistent(Q_partitions[0], R_partitions[0])):
@@ -112,7 +79,7 @@ def LEM(S, R):
     return """ Something went wrong with LOWER and UPPER approximations !!! """
 
 
-def cutpointStrategy1(listOfDict):
+def cutpointStrategy(listOfDict):
     """
     Applying discritization using all cutpoint strategy
     """
@@ -157,7 +124,7 @@ def dictToTuple(dic):
     return tup
 
 
-def generateRules1(singleCovering, decisions):
+def generateRules(singleCovering, decisions):
     """
     Generate Rules from the given single covering to the decisions
     """

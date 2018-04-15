@@ -163,7 +163,7 @@ def classificationOfCases(caseNum, Cases, RuleStats, DesName, strengthFactor, ma
                 if item['partialMatchingFactor'] >= maxPartialMatchingFactor:
                     maxPartialMatchingFactor = item['partialMatchingFactor']
                     id3 = item['id']
-    if (id2 == id1 or id1 == 'sample') and (id2 == id3 or id3 == 'sample1'):
+    if ([i['decision'] for i in RuleStats if i['id'] == id2] == [i['decision'] for i in RuleStats if i['id'] == id1] or id1 == 'sample') and ([i['decision'] for i in RuleStats if i['id'] == id2] == [i['decision'] for i in RuleStats if i['id'] == id3] or id3 == 'sample1'):
         if [Cases[caseNum][DesName]] == [i['decision'] for i in RuleStats if i['id'] == id2] or flag == 1:
             return 1
         else:
