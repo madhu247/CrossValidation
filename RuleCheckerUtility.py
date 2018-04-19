@@ -1,12 +1,13 @@
 #!usr/bin/python
 
 """
-utility.py, by Madhu Chegondi, 03-23-2018
+RuleCheckerUtility.py, by Madhu Chegondi
 """
 import re
 import LEM1Utility
 
 def getRuleTrainStats(Rules, trainAttr, trainDes, DesName):
+    """This method is used to return the 3 numbers preceding the Rules"""
     Cases = []
     for i in trainAttr:
         Cases.append(dict(i))
@@ -44,6 +45,7 @@ def getRuleTrainStats(Rules, trainAttr, trainDes, DesName):
 
 
 def checkRulesForPartialMatching(Rules, Cases, DesName):
+    """returns number of matched conditions in partial matching"""
     Keys = [ k for k in Rules.keys() if k not in ['specificity', 'strength', 'numOfTrainCasesMatched', DesName, 'numOfConditions']]
     flag = 0
     matchedCases = 0
@@ -66,6 +68,7 @@ def checkRulesForPartialMatching(Rules, Cases, DesName):
 
 
 def checkRules(Rules, Cases, DesName):
+    """Checks for complete matching and returns matched cases which helps to classify the case based on comp or part or notClass at all"""
     Keys = [ k for k in Rules.keys() if k not in ['specificity', 'strength', 'numOfTrainCasesMatched', DesName, 'numOfConditions']]
     flag = 0
     matchedCases = 0
@@ -104,13 +107,16 @@ def getValues(symNumericals):
     return values
 
 
-def getRuleStats(Rule, caseNum, DesName, j, id, matchedCases, strengthFactor, matchingFactor='n'):
+def getRuleStats(Rule, caseNum, DesName, j, id, matchedCases, strengthFactor, matchingFactor='n', specificityFactor='n'):
+    """check which rules are matched with a particular case. Output is used to resolve conflicts on rules by voting"""
     matchedRuleStats = {}
     matchedRuleStats['id'] = id
     matchedRuleStats['decision'] = Rule[DesName]
     matchedRuleStats['CaseNumber'] = caseNum
-    matchedRuleStats['specificity'] = Rule['specificity']
-    matchedRuleStats['strength'] = Rule['strength']
+    if specificityFactor == 'y':
+        matchedRuleStats['specificity'] = Rule['specificity']
+    else:
+        matchedRuleStats['specificity'] = 1
     matchedRuleStats['RuleNum'] = j
     matchedRuleStats['matchedCases'] = matchedCases
     if matchingFactor == 'y':
@@ -120,14 +126,17 @@ def getRuleStats(Rule, caseNum, DesName, j, id, matchedCases, strengthFactor, ma
         matchedRuleStats['partialMatchingFactor'] = 1
     if strengthFactor == 'p':
         condProb = round(float(Rule['strength'])/float(Rule['numOfTrainCasesMatched']),2)
-        matchedRuleStats['condProb'] = condProb
+        matchedRuleStats['sp'] = condProb
+    else:
+        matchedRuleStats['sp'] = Rule['strength']
     return matchedRuleStats
 
 
 def classificationOfCases(caseNum, Cases, RuleStats, DesName, strengthFactor, matchingFactor='n', specificityFactor='n', supportFactor='n'):
+    """Classifies the cases based on voting receiving user inputs on the strategies"""
     support = {}
-    id1 = 'sample'
-    id3 = 'sample1'
+    id1 = []
+    id3 = []
     maxSpecificity = 0
     maxStrength = 0
     maxSupport = 0
@@ -135,7 +144,7 @@ def classificationOfCases(caseNum, Cases, RuleStats, DesName, strengthFactor, ma
     flag = 0
     listOfDecisions = list(set([item['decision'] for item in RuleStats if item['CaseNumber'] == caseNum]))
     for i in listOfDecisions:
-        support[i] = sum([item['partialMatchingFactor'] * item['strength'] * item['specificity'] for item in RuleStats if item['CaseNumber'] == caseNum and item['decision'] == i])
+        support[i] = sum([item['partialMatchingFactor'] * item['sp'] * item['specificity'] for item in RuleStats if item['CaseNumber'] == caseNum and item['decision'] == i])
     if supportFactor == 'y':
         keyValueTup = [(value, key) for key, value in support.items()]
         # if support of both decisions is same this program picks the desicion Name in Alphabetical order
@@ -150,20 +159,20 @@ def classificationOfCases(caseNum, Cases, RuleStats, DesName, strengthFactor, ma
             if specificityFactor == 'y':
                 if item['specificity'] >= maxSpecificity:
                     maxSpecificity = item['specificity']
-                    id1 = item['id']
+                    id1.append(item['id'])
             if strengthFactor == 's':
-                if item['strength'] >= maxStrength:
-                    maxStrength = item['strength']
+                if item['sp'] >= maxStrength:
+                    maxStrength = item['sp']
                     id2 = item['id']
             else:
-                if item['condProb'] >= maxCondProb:
-                    maxCondProb = item['condProb']
+                if item['sp'] >= maxCondProb:
+                    maxCondProb = item['sp']
                     id2 = item['id']
             if matchingFactor == 'y':
                 if item['partialMatchingFactor'] >= maxPartialMatchingFactor:
                     maxPartialMatchingFactor = item['partialMatchingFactor']
-                    id3 = item['id']
-    if ([i['decision'] for i in RuleStats if i['id'] == id2] == [i['decision'] for i in RuleStats if i['id'] == id1] or id1 == 'sample') and ([i['decision'] for i in RuleStats if i['id'] == id2] == [i['decision'] for i in RuleStats if i['id'] == id3] or id3 == 'sample1'):
+                    id3.append(item['id'])
+    if (id2 in id1 or id1 == []) and (id2 in id3 or id3 == []):
         if [Cases[caseNum][DesName]] == [i['decision'] for i in RuleStats if i['id'] == id2] or flag == 1:
             return 1
         else:

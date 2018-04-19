@@ -1,7 +1,7 @@
 #!usr/bin/python
 
 """
-main.py, by Madhu Chegondi, 03-23-2018
+RuleChecker.py, by Madhu Chegondi
 """
 
 import RuleCheckerUtility
@@ -85,4 +85,4 @@ def RuleChecker(Rules, Cases, DesName, strengthFactor, matchingFactor = None, sp
     notClassifiedPlusInCorrCases = parInCorClass + notClassifiedCases
     if len(Cases) == 0:
         return 0
-    return round(float(notClassifiedPlusInCorrCases)/float(len(Cases)) , 2)
+    return round(float(notClassifiedPlusInCorrCases)/float(len(Cases)) , 4) * 100

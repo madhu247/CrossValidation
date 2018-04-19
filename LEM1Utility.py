@@ -1,7 +1,7 @@
 #!usr/bin/python
 
 """
-utility.py, by Madhu Chegondi, 03-23-2018
+LEM1Utility.py, by Madhu Chegondi, 03-23-2018
 """
 
 def computePartitions(S):

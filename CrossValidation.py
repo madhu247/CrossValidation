@@ -1,3 +1,9 @@
+#!usr/bin/python
+
+"""
+CrossValidation.py, by Madhu Chegondi
+"""
+
 from sklearn.utils import resample
 import LEM1
 import RuleCheckerUtility
@@ -5,10 +11,13 @@ import LEM1Utility
 import RuleChecker
 import json
 import datetime
+import os
 
 def writeToLog(logData, df):
+    if not os.path.exists('Logs'):    # Create an output folder for storing
+        os.makedirs('Logs')           # output files with rules
     index = df.find('.')
-    with open('log_'+df[0:index]+'.txt', 'a') as outfile:
+    with open('Logs/'+'log_'+df[0:index]+'.json', 'a') as outfile:
         outfile.write(json.dumps(logData, default = str)+"\n")
     outfile.close()
 
@@ -74,7 +83,7 @@ def CrossValidation(attr, decisions, DesName, meathod, samples, df):
                 ErrorRates.append(RuleChecker.RuleChecker(Rules, testDataAttr, DesName, strengthFactor, matchingFactor, specificityFactor, supportFactor))
             print '\033[F'
             logData['ErrorRate'] = round(sum(ErrorRates)/float(len(ErrorRates)),2)
-            logData['Acc'] = round(1 - logData['ErrorRate'],2)
+            logData['Acc'] = round(100 - logData['ErrorRate'],2)
             logData['NumberOfSamplesCreated'] = int(samples)
             logData['method'] = 'Bootstrap'
             logData['FileName'] = df
@@ -108,7 +117,7 @@ def CrossValidation(attr, decisions, DesName, meathod, samples, df):
                 ErrorRates.append(RuleChecker.RuleChecker(Rules, testDataAttr, DesName, strengthFactor, matchingFactor, specificityFactor, supportFactor))
             print '\033[F'
             logData['ErrorRate'] = round(sum(ErrorRates)/float(len(attr)),2)
-            logData['Acc'] = round(1 - logData['ErrorRate'],2)
+            logData['Acc'] = round(100 - logData['ErrorRate'],2)
             logData['NumberOfFoldsCreated'] = len(attr)
             logData['method'] = 'LOOCV'
             logData['FileName'] = df

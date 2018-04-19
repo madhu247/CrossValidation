@@ -1,11 +1,12 @@
 #!usr/bin/python
 """
-    main.py, by Madhu Chegondi, 10-06-2017
+    LEM1.py, by Madhu Chegondi
     This program takes a data file and generate rules for the DATASET
 """
 import LEM1Utility
 
 def LEM1Classifier(trainDataAttr, trainDataDes, DesName):
+    """Compute Rules from the given dataset"""
     updatedAttr = LEM1Utility.cutpointStrategy(trainDataAttr)
 
     # Converiting list of dictionaries to "list of List of tuples"
